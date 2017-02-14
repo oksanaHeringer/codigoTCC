@@ -45,14 +45,6 @@ begin # Problema DENSCHNC do CUTEst
   println(x)
 end
 
-begin
-  @green("Rodando")
-  nlp = ADNLPModel(x->sum(x.^10)/10, [1.0;1.0]) #
-  x, fx, ngx = solve_unc(nlp) #solve_unc é sua implementação
-  @test norm(x - [0.0,0.0] ) < 1e-6
-  @test norm(fx) < 1e-6
-  println(x)
-end
 
 begin
   @green("Rodando hs26")
