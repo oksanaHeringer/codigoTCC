@@ -1,8 +1,10 @@
+using Krylov
+
 function solve_unc(nlp; tol=1e-6, maxiter = 1000)
     x = nlp.meta.x0
     f(x) = obj(nlp, x)
     ∇f(x) = grad(nlp, x)
-    H(x) = full(hess_op(nlp, x))
+    H(x) = (hess_op(nlp, x))
     iter = 0
     ef = 0
     fx = f(x)
@@ -10,7 +12,7 @@ function solve_unc(nlp; tol=1e-6, maxiter = 1000)
     Hx = H(x)
     while norm(∇fx) > tol
         t = 1.0
-        d = -Hx\∇fx
+        d, stats =  cg(Hx,-∇fx)
         while f(x + t*d) > fx + 0.01*t*dot(∇fx,d)
             t = t*0.9
         end
