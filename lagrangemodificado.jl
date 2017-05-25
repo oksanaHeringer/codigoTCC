@@ -1,44 +1,38 @@
-#Oksana Heringer da Silva - GRR20110467 - Trabalho MiniTCC - Data:02/12/2015
-#Método de Lagrange
-
+using Base.Test
 using NLPModels
 using Krylov
+using ForwardDiff
 
-function lagrangeano_aumentado(nlp,W;u=1.0, ϵ=1e-6, max_time=60, max_iter=1000)
+include("reg.jl")
+
+function lagrangeano_aumentado_exato(nlp;μ=1.0, ϵ=1e-6, λ_min=0, max_time=30, max_iter=1000)
     exit_flag = 0
     iter = 1
     x = nlp.meta.x0
     f(x) = obj(nlp, x)
-    g(x) = grad(nlp, x)
-    J(x) = (hess_op(nlp, x))
-    c(x) = cons(nlp, x)#restrição
+    c(x) = cons(nlp, x)
+    gx = grad(nlp, x)
+    Jx = jac_op(nlp, x)
     fx = f(x)
-    gx = g(x)
-    Jx = J(x)
     cx = c(x)
-    λ = (Jx*Jx')\(Jx*gx)
-    Wx = W(x,λ)
-    #L=fx-dot(cx,λ)
-    gL = gx-Jx'*λ
+    λ = ones(nlp.meta.ncon)
+    ϵsub = 1.0
+    ∇LA = gx + Jx'*(λ + μ*cx)
+
     start_time = time()
     elapsed_time = 0.0
 
-  while norm(gL) > ϵ || norm(cx) > ϵ
-    #t = 1.0
-    d, stats =  cg(Hx,-∇fx)
-    x = x + d
-    #println("x = $(round(x,3))")
+  while norm(∇LA) > ϵ || norm(cx) > ϵ && (iter < max_iter)
+
+    subnlp = create_sub_problem(nlp, x, μ, λ)
+    x, fx, ng = reg_conf(subnlp)
     fx = f(x)
-    gx = grad(nlp, x)
-    Jx = (hess_op(nlp, x))
-    Wx = W(x,λ)
     cx = c(x)
-    #Lnew = fx-dot(cx,λ)
-    #L=Lnew
-    λ = (Jx*Jx')\(Jx*gx)
-    u = u*1.1
-    #τ = τ*0.9
-    gL = gx-Jx'*λ
+    gx = grad(nlp, x)
+    Jx = jac_op(nlp, x)
+    μ = μ*1.1
+    λ = λ + μ*cx
+    ∇LA = gx + Jx'*(λ + μ*cx)
     iter = iter + 1
     if iter >= max_iter
         exit_flag = 1
@@ -50,11 +44,13 @@ function lagrangeano_aumentado(nlp,W;u=1.0, ϵ=1e-6, max_time=60, max_iter=1000)
         break
     end
   end
-  return x, fx, gx, exit_flag, iter, elapsed_time
+  return x, fx, norm(∇LA), norm(cx), iter, elapsed_time, exit_flag
 end
 
-
-#=function newton(Wx,gx,Jx,λ,u,cx)
-  d = -Wx\(gx - Jx'*(λ-u*cx))
-  return d
-end=#
+function create_sub_problem(nlp, x, μ, λ)
+  c(x) = cons(nlp, x)
+  LA(x) = obj(nlp,x) + dot(λ,cons(nlp,x)) + μ/2*norm(cons(nlp, x))^2
+  ∇LA(x) = grad(nlp,x) + jtprod(nlp, x, λ + μ*c(x))
+  HLAv(x, v; obj_weight=1.0) = hprod(nlp, x, v, y=μ*c(x)) + hprod(nlp, x, v, y=λ) + μ*jtprod(nlp, x, jprod(nlp, x, v))
+  subnlp = SimpleNLPModel(LA, x, g=∇LA, Hp=HLAv)
+end
