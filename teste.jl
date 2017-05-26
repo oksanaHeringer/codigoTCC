@@ -45,7 +45,6 @@ begin # Problema DENSCHNC do CUTEst
   println(x)
 end
 
-
 begin
   @green("Rodando hs26")
   nlp = ADNLPModel(x->(x[1] - x[2])^2 + (x[2] - x[3])^4, [-2.6, 2.0, 2.0] )
