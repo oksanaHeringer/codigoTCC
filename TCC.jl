@@ -3,14 +3,15 @@ using BenchmarkProfiles
 using Plots
 include("PNLPenalidade.jl")
 
-#problems = CUTEst.select(min_con=1, only_free_var=true, only_equ_con=true)
-problems = filter(x->contains(x, "HS") && length(x) <= 5, CUTEst.select(only_free_var=true, only_equ_con=true))
+problems = CUTEst.select(min_con=1, only_free_var=true, only_equ_con=true)
+#problems = filter(x->contains(x, "HS") && length(x) <= 5, CUTEst.select(only_free_var=true, only_equ_con=true))
 #problems = ["BT1", "HS26", "HS27", "HS28", "HS39"]
 metodos =[lagrangeano_aumentado_exato, lagrangeano_aumentado, penalidade_quadratica]
 sort!(problems)
 np = length(problems)
 nmet = length(metodos)
 T = -ones(np, nmet)
+Av = ones(np, nmet)
 for (j,metodo) in enumerate(metodos)
     open("$metodo.txt", "w") do file
         str = @sprintf("%8s  %10s  %10s  %7s %7s %7s  %7s  %7s  %7s  %10s\n",
@@ -28,6 +29,7 @@ for (j,metodo) in enumerate(metodos)
                 print(file, str)
                 if s == 0
                   T[i,j] = max_time
+                  Av[i,j] = sum_counters(nlp)
                 end
                 reset!(nlp)
             catch
@@ -42,4 +44,6 @@ for (j,metodo) in enumerate(metodos)
 end
 
 performance_profile(T, ["Lagrange exato", "Lagrange", "Penalidade"])
+performance_profile(Av, ["Lagrange exato", "Lagrange", "Penalidade"])
 png("perf-tempo1")
+png("avaliacoes1")
