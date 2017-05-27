@@ -1,12 +1,10 @@
-using CUTEst
-using BenchmarkProfiles
-using Plots
+using CUTEst, BenchmarkProfiles, Plots
 include("PNLPenalidade.jl")
 
-problems = CUTEst.select(min_con=1, only_free_var=true, only_equ_con=true)
-#problems = filter(x->contains(x, "HS") && length(x) <= 5, CUTEst.select(only_free_var=true, only_equ_con=true))
+#problems = CUTEst.select(min_con=1, only_free_var=true, only_equ_con=true)
+problems = filter(x->contains(x, "HS") && length(x) <= 5, CUTEst.select(only_free_var=true, only_equ_con=true))
 #problems = ["BT1", "HS26", "HS27", "HS28", "HS39"]
-metodos =[lagrangeano_aumentado_exato, lagrangeano_aumentado, penalidade_quadratica]
+metodos = [lagrangiano_exato, lagrangiano_aumentado, penalidade_quadratica]
 sort!(problems)
 np = length(problems)
 nmet = length(metodos)
@@ -45,5 +43,5 @@ end
 
 performance_profile(T, ["Lagrange exato", "Lagrange", "Penalidade"])
 performance_profile(Av, ["Lagrange exato", "Lagrange", "Penalidade"])
-png("perf-tempo1")
-png("avaliacoes1")
+png("perf-tempo2")
+png("avaliacoes2")
