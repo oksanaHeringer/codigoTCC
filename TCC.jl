@@ -9,7 +9,7 @@ sort!(problems)
 np = length(problems)
 nmet = length(metodos)
 T = -ones(np, nmet)
-Av = ones(np, nmet)
+Av = -ones(np, nmet)
 for (j,metodo) in enumerate(metodos)
     open("$metodo.txt", "w") do file
         str = @sprintf("%8s  %10s  %10s  %7s %7s %7s  %7s  %7s  %7s  %10s\n",
