@@ -1,5 +1,4 @@
 using Base.Test, NLPModels, Krylov, ForwardDiff
-
 include("reg.jl")
 
 function lagrangiano_exato(nlp;μ=1.0, ϵ=1e-6, λ_min=0, max_time=30, max_iter=1000)
