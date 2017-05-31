@@ -27,6 +27,7 @@ function lagrangiano_exato(nlp;μ=1.0, ϵ=1e-6, max_time=30, max_iter=1000)
     Jx = jac_op(nlp, x)
     λ = cgls(Jx', -gx)[1]
     μ = μ*1.1
+    ϵsub = 0.1*ϵsub
     ∇LA = gx + Jx'*(λ + μ*cx)
 
     iter = iter + 1

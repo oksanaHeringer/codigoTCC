@@ -26,6 +26,7 @@ function lagrangiano_aumentado(nlp;μ=1.0, ϵ=1e-6, λ_min=0, max_time=30, max_i
     gx = grad(nlp, x)
     Jx = jac_op(nlp, x)
     μ = μ*1.1
+    ϵsub = 0.1*ϵsub
     λ = λ + μ*cx
     ∇LA = gx + Jx'*(λ + μ*cx)
     iter = iter + 1
