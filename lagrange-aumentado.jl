@@ -1,7 +1,7 @@
 using Base.Test, NLPModels, Krylov, ForwardDiff
 include("reg.jl")
 
-function lagrangiano_aumentado(nlp;μ=1.0, ϵ=1e-6, max_time=30, max_iter=1000)
+function lagrangiano_aumentado(nlp;μ=1.0, ϵ=1e-6, λ_min=0, max_time=30, max_iter=1000)
   exit_flag = 0
   iter = 1
   x = nlp.meta.x0
@@ -9,9 +9,9 @@ function lagrangiano_aumentado(nlp;μ=1.0, ϵ=1e-6, max_time=30, max_iter=1000)
   c(x) = cons(nlp, x)
   gx = grad(nlp, x)
   Jx = jac_op(nlp, x)
-  λ = cgls(Jx', -gx)[1]
   fx = f(x)
   cx = c(x)
+  λ = ones(nlp.meta.ncon)
   ϵsub = 1.0
   ∇LA = gx + Jx'*(λ + μ*cx)
 
@@ -25,10 +25,9 @@ function lagrangiano_aumentado(nlp;μ=1.0, ϵ=1e-6, max_time=30, max_iter=1000)
     cx = c(x)
     gx = grad(nlp, x)
     Jx = jac_op(nlp, x)
-    λ = cgls(Jx', -gx)[1]
     μ = μ*1.1
+    λ = λ + μ*cx
     ∇LA = gx + Jx'*(λ + μ*cx)
-
     iter = iter + 1
     if iter >= max_iter
       exit_flag = 1

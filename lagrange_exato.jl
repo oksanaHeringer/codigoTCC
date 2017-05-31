@@ -20,7 +20,7 @@ function lagrangiano_exato(nlp;μ=1.0, ϵ=1e-6, λ_min=0, max_time=30, max_iter=
 
   while norm(∇LA) > ϵ || norm(cx) > ϵ && (iter < max_iter)
     subnlp = create_sub_problem(nlp, x, μ, λ)
-    x, fx, ng = reg_conf(subnlp)
+    x, fx, ng = reg_conf(subnlp, atol=ϵsub)
     fx = f(x)
     cx = c(x)
     gx = grad(nlp, x)
