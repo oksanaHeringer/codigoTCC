@@ -47,6 +47,6 @@ function create_sub_problem(nlp, x, μ, λ)
   c(x) = cons(nlp, x)
   LA(x) = obj(nlp,x) + dot(λ,cons(nlp,x)) + μ/2*norm(cons(nlp, x))^2
   ∇LA(x) = grad(nlp,x) + jtprod(nlp, x, λ + μ*c(x))
-  HLAv(x, v; obj_weight=1.0) = hprod(nlp, x, v, y=μ*c(x)) + hprod(nlp, x, v, y=λ) + μ*jtprod(nlp, x, jprod(nlp, x, v))
+  HLAv(x, v; obj_weight=1.0) = hprod(nlp, x, v, y=μ*c(x)+λ) + μ*jtprod(nlp, x, jprod(nlp, x, v))
   subnlp = SimpleNLPModel(LA, x, g=∇LA, Hp=HLAv)
 end
