@@ -1,7 +1,7 @@
 using Base.Test, NLPModels, Krylov, ForwardDiff
 include("reg.jl")
 
-function lagrangiano_aumentado(nlp;μ=10, ϵ=1e-6, λ_min=0, max_time=30, max_iter=1000)
+function lagrangiano_aumentado(nlp;μ=10, ϵ=1e-8, λ_min=0, max_time=30, max_iter=1000)
   exit_flag = 0
   iter = 1
   x = nlp.meta.x0
@@ -29,11 +29,9 @@ function lagrangiano_aumentado(nlp;μ=10, ϵ=1e-6, λ_min=0, max_time=30, max_it
 
     if norm(cx) < η
       λ = λ + μ*cx
-      μ = μ
       η = η/μ^(0.9)
       ϵsub = ϵsub/μ
     else
-      λ = λ
       μ = 100*μ
       η = 1/μ^(0.1)
       ϵsub = 1/μ

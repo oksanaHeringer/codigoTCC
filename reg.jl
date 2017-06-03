@@ -2,7 +2,7 @@ using Krylov
 using ForwardDiff
 using LinearOperators
 
-function reg_conf(nlp; η = 0.25 ,η1 = 0.25, η2 = 0.75, σ1 = 0.5, σ2 = 2.0, atol = 1e-6, rtol = 1e-4)
+function reg_conf(nlp; η = 0.25 ,η1 = 0.25, η2 = 0.75, σ1 = 0.5, σ2 = 2.0, atol = 1e-6, rtol = 0.0)
     k_max = 10000
     tempo_max = 30
     saida = 0
@@ -26,6 +26,9 @@ function reg_conf(nlp; η = 0.25 ,η1 = 0.25, η2 = 0.75, σ1 = 0.5, σ2 = 2.0, 
         ρ = ared/pred
         if ρ > η
             x = x + d
+            gx = g(x)
+            fx = f(x)
+            Hx = H(x)
         end
         if ρ < η1
             Δ = σ1*Δ
@@ -41,9 +44,6 @@ function reg_conf(nlp; η = 0.25 ,η1 = 0.25, η2 = 0.75, σ1 = 0.5, σ2 = 2.0, 
             saida = 2
             break
         end
-        gx = g(x)
-        fx = f(x)
-        Hx = H(x)
         k = k + 1
     end
     return x, fx, norm(gx)

@@ -2,7 +2,7 @@ using Base.Test, NLPModels, ForwardDiff
 
 include("reg.jl")
 
-function penalidade_quadratica(nlp;μ=10, ϵ=1e-6, max_iter=1000, max_time=30)
+function penalidade_quadratica(nlp;μ=10, ϵ=1e-8, max_iter=1000, max_time=30)
   exit_flag = 0
   iter = 1
   x = nlp.meta.x0
@@ -31,11 +31,9 @@ function penalidade_quadratica(nlp;μ=10, ϵ=1e-6, max_iter=1000, max_time=30)
 
     if norm(cx) < η
       λ = cgls(Jx', -gx)[1]
-      μ = μ
       η = η/μ^(0.9)
       ϵsub = ϵsub/μ
     else
-      λ = λ
       μ = 100*μ
       η = 1/μ^(0.1)
       ϵsub = 1/μ
