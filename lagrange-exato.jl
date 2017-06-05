@@ -19,7 +19,7 @@ function lagrangiano_exato(nlp;μ=10, ϵ=1e-8, max_time=30, max_iter=1000)
   start_time = time()
   elapsed_time = 0.0
 
-  while norm(∇LA) > ϵ || norm(cx) > ϵ && (iter < max_iter)
+  while norm(gx + Jx'*(λ + μ*cx)) > ϵ || norm(cx) > ϵ && (iter < max_iter)
     subnlp = create_sub_problem(nlp, x, μ, λ)
     x, fx, ng = reg_conf(subnlp, atol=ϵsub)
     fx = f(x)
@@ -32,7 +32,7 @@ function lagrangiano_exato(nlp;μ=10, ϵ=1e-8, max_time=30, max_iter=1000)
       η = η/μ^(0.9)
       ϵsub = ϵsub/μ
     else
-      μ = 100*μ
+      μ = 10*μ
       η = 1/μ^(0.1)
       ϵsub = 1/μ
     end

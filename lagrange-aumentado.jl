@@ -9,9 +9,9 @@ function lagrangiano_aumentado(nlp;μ=10, ϵ=1e-8, λ_min=0, max_time=30, max_it
   c(x) = cons(nlp, x)
   gx = grad(nlp, x)
   Jx = jac_op(nlp, x)
+  λ = ones(nlp.meta.ncon)
   fx = f(x)
   cx = c(x)
-  λ = ones(nlp.meta.ncon)
   ϵsub = 1/μ
   ∇LA = gx + Jx'*(λ + μ*cx)
   η = 1/μ^(0.1)
@@ -19,7 +19,7 @@ function lagrangiano_aumentado(nlp;μ=10, ϵ=1e-8, λ_min=0, max_time=30, max_it
   start_time = time()
   elapsed_time = 0.0
 
-  while norm(∇LA) > ϵ || norm(cx) > ϵ && (iter < max_iter)
+  while norm(gx + Jx'*(λ + μ*cx)) > ϵ || norm(cx) > ϵ && (iter < max_iter)
     subnlp = create_sub_problem(nlp, x, μ, λ)
     x, fx, ng = reg_conf(subnlp, atol=ϵsub)
     fx = f(x)
@@ -32,7 +32,7 @@ function lagrangiano_aumentado(nlp;μ=10, ϵ=1e-8, λ_min=0, max_time=30, max_it
       η = η/μ^(0.9)
       ϵsub = ϵsub/μ
     else
-      μ = 100*μ
+      μ = 10*μ
       η = 1/μ^(0.1)
       ϵsub = 1/μ
     end

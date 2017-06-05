@@ -1,5 +1,4 @@
 using Base.Test, NLPModels, ForwardDiff
-
 include("reg.jl")
 
 function penalidade_quadratica(nlp;μ=10, ϵ=1e-8, max_iter=1000, max_time=30)
@@ -11,19 +10,18 @@ function penalidade_quadratica(nlp;μ=10, ϵ=1e-8, max_iter=1000, max_time=30)
   gx = grad(nlp, x)
   Jx = jac_op(nlp, x)
   λ = cgls(Jx', -gx)[1]
-  ∇L = gx + Jx'*λ
   fx = f(x)
   cx = c(x)
   ϵsub = 1/μ
+  ∇L = gx + Jx'*λ
   η = 1/μ^(0.1)
 
   start_time = time()
   elapsed_time = 0.0
 
-  while norm(∇L) > ϵ || norm(cx) > ϵ && (iter < max_iter)
+  while norm(gx + Jx'*λ) > ϵ || norm(cx) > ϵ && (iter < max_iter)
     subnlp = create_sub_problem(nlp, x, μ)
     x, fx, ng = reg_conf(subnlp, atol=ϵsub)
-
     fx = f(x)
     cx = c(x)
     gx = grad(nlp, x)
@@ -34,7 +32,7 @@ function penalidade_quadratica(nlp;μ=10, ϵ=1e-8, max_iter=1000, max_time=30)
       η = η/μ^(0.9)
       ϵsub = ϵsub/μ
     else
-      μ = 100*μ
+      μ = 10*μ
       η = 1/μ^(0.1)
       ϵsub = 1/μ
     end
