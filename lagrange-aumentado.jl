@@ -19,7 +19,7 @@ function lagrangiano_aumentado(nlp;μ=10, ϵ=1e-8, λ_min=0, max_time=30, max_it
   start_time = time()
   elapsed_time = 0.0
 
-  while norm(gx + Jx'*(λ + μ*cx)) > ϵ || norm(cx) > ϵ && (iter < max_iter)
+  while norm(gx + Jx'*λ) > ϵ || norm(cx) > ϵ && (iter < max_iter)
     subnlp = create_sub_problem(nlp, x, μ, λ)
     x, fx, ng = reg_conf(subnlp, atol=ϵsub)
     fx = f(x)
@@ -55,6 +55,6 @@ function create_sub_problem(nlp, x, μ, λ)
   c(x) = cons(nlp, x)
   LA(x) = obj(nlp,x) + dot(λ,cons(nlp,x)) + μ/2*norm(cons(nlp, x))^2
   ∇LA(x) = grad(nlp,x) + jtprod(nlp, x, λ + μ*c(x))
-  HLAv(x, v; obj_weight=1.0) = hprod(nlp, x, v, y=μ*c(x)+λ) + μ*jtprod(nlp, x, jprod(nlp, x, v))
+  HLAv(x, v; obj_weight=1.0, y=zeros) = hprod(nlp, x, v, y=μ*c(x)+λ) + μ*jtprod(nlp, x, jprod(nlp, x, v))
   subnlp = SimpleNLPModel(LA, x, g=∇LA, Hp=HLAv)
 end
