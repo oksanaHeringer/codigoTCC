@@ -9,7 +9,7 @@ function lagrangiano_aumentado(nlp;μ=10, ϵ=1e-8, λ_min=0, max_time=30, max_it
   c(x) = cons(nlp, x)
   gx = grad(nlp, x)
   Jx = jac_op(nlp, x)
-  λ = ones(nlp.meta.ncon)
+  λ = zeros(nlp.meta.ncon)
   fx = f(x)
   cx = c(x)
   ϵsub = 1/μ

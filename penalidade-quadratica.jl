@@ -19,7 +19,7 @@ function penalidade_quadratica(nlp;μ=10, ϵ=1e-8, max_iter=1000, max_time=30)
   start_time = time()
   elapsed_time = 0.0
 
-  while norm(gx + Jx'*λ) > ϵ || norm(cx) > ϵ && (iter < max_iter)
+  while norm(∇L) > ϵ || norm(cx) > ϵ && (iter < max_iter)
     subnlp = create_sub_problem(nlp, x, μ)
     x, fx, ng = reg_conf(subnlp, atol=ϵsub)
     fx = f(x)
