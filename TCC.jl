@@ -45,9 +45,12 @@ for (j,metodo) in enumerate(metodos)
   end
 end
 
-performance_profile(T, ["Lagrange exato", "Lagrange", "Penalidade"], legend=:bottomright)
-#xlabel!("Nome em br")
+performance_profile(T, ["Lagrange λ quad min", "Lagrange λ iterativo", "Penalidade"], legend=:bottomright)
+xlabel!("Tempo (escala logarítmica)")
+ylabel!("Proporção de problemas")
 png("perf-tempo")
 
-performance_profile(Av, ["Lagrange exato", "Lagrange", "Penalidade"], legend=:bottomright)
+performance_profile(Av, ["Lagrange λ quad min", "Lagrange λ iterativo", "Penalidade"], legend=:bottomright)
+xlabel!("Número de Avaliações (escala logarítmica)")
+ylabel!("Proporção de problemas")
 png("avaliacoes")
